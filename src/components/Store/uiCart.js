@@ -21,6 +21,7 @@ const authSlice = createSlice({
     },
   },
 });
+
 // export default AuthSlice.reducer;
 export const uiActions = authSlice.actions;
 
