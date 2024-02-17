@@ -1,27 +1,44 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = { cartTotal: 0, cartItems: [] };
-const  cartSlice = createSlice({
-    name:"cart",
-    initialState ,  
-    reducers:{
-        addToCart:(state,action)=>{
-            const item= action.payload;
-            
-           state.cartItems.push(item);
-           state.cartTotal +=1;
-           console.log(state.cartItems)
-         },
-        removeFromCart:(state,action) =>{
-          let index = state.cartItems.findIndex((i)=> i.id===action.payload);
-          if (index!==-1){
-              state.cartItems.splice(index,1);
-              state.cartTotal -=1 ;
-              console.log(state.cartItems)
+const cartSlice = createSlice({
+  name: "cart",
+  initialState,
+  reducers: {
+    addToCart: (state, action) => {
+      const newItem = action.payload;
+      const existingItem = state.cartItems.find(
+        (x) => x.itemId == newItem.itemId
+      );
+      console.log(newItem, existingItem);
+      if (!existingItem) {
+        state.cartItems.push({
+          itemId: newItem.itemId,
+          price: newItem.price,
+          quantity: 1,
+          totalPrice: 0,
+          name: newItem.title,
+        });
+      } else {
+        existingItem.quantity++;
+        existingItem.totalPrice += newItem.price;
+      }
+      state.cartTotal += 1;
+    },
+    removeFromCart: (state, action) => {
+      const index = state.cartItems.findIndex((x) => x.name === action.payload);
 
-          }          
-       },
-    }}
-     );
-     export const CartActions = cartSlice.actions;
-     export default  cartSlice;
-
+      if (index > -1) {
+        if (state.cartItems[index].quantity > 1) {
+          state.cartItems[index].quantity--;
+        } else {
+          state.cartItems = state.cartItems.filter(
+            (item) => item.name !== action.payload
+          );
+        }
+        state.cartTotal -= 1;
+      }
+    },
+  },
+});
+export const CartActions = cartSlice.actions;
+export default cartSlice;
